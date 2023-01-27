@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 
 import { Statistics } from 'components/Statistics/Statistics';
 import { Section } from 'components/Section/Section';
@@ -7,37 +7,46 @@ import { Notification } from 'components/Notification/Notification';
 
 import { Container} from './App.styled';
 
-export class App extends Component {
-
-  state = {
-  good: 0,
-  neutral: 0,
-  bad: 0,
-    }
-
-onLeaveFeedback = state => {this.setState(prevState => ({[state]: prevState[state] + 1}));}
-
-countTotalFeedback = () => Object.values(this.state).reduce((acc, option) => acc + option, 0);
-countPositiveFeedbackPercentage = () => Math.round((this.state.good / this.countTotalFeedback()) * 100 || 0);
+export const App = () => {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const[bad, setBad] = useState(0);
   
-  render() {
+const options = ['good', 'neutral', 'bad'];
 
-    const { good, neutral, bad } = this.state;
+  const onLeaveFeedback = (option) => {
+  switch (option) {
+      case 'good':
+        setGood(prevState =>(prevState + 1));
+        break;
+      case 'neutral':
+        setNeutral(prevState =>(prevState + 1));
+        break;
+      case 'bad':
+        setBad(prevState =>(prevState + 1));
+        break;
+      default:
+        break;
+    }
+}
+
+const countTotalFeedback = () => good + neutral + bad;;
+const countPositiveFeedbackPercentage = () => Math.round((good * 100) / countTotalFeedback() || 0);
 
     return (
     <Container>
       <Section title="Please leave feedback">
-        <FeedbackOptions options={this.state} onLeaveFeedback={this.onLeaveFeedback} />
+        <FeedbackOptions options={options} onLeaveFeedback={onLeaveFeedback} />
       </Section>
         
-      {(this.countTotalFeedback() !== 0) ?
+      {(countTotalFeedback() !== 0) ?
         (<Section title="Statistics">
           <Statistics
             good={good}
             neutral={neutral}
             bad={bad}
-            total={this.countTotalFeedback()}
-            positivePercentage={this.countPositiveFeedbackPercentage()}
+            total={countTotalFeedback()}
+            positivePercentage={countPositiveFeedbackPercentage()}
           /> 
           </Section>) :
           (<Notification message="There is no feedback"></Notification>)
@@ -46,4 +55,4 @@ countPositiveFeedbackPercentage = () => Math.round((this.state.good / this.count
     )
   }
 
-}
+
